@@ -146,7 +146,7 @@ conflict with the maximum filename length, the default replacements will be
 used to resolve the conflict and beets will display a warning.
 
 Note that paths might contain special characters such as typographical
-quotes (``“”``). With the configuration above, those will not be
+quotes (``""``). With the configuration above, those will not be
 replaced as they don't match the typewriter quote (``"``). To also strip these
 special characters, you can either add them to the replacement list or use the
 :ref:`asciify-paths` configuration option below.
@@ -977,9 +977,11 @@ to the beets library::
 
 
 The library fields of the corresponding :ref:`autotagger_extensions` are used
-to save the data (``discogs_albumid``, ``bandcamp_album_id``,
+to save the data. For albums, the fields are ``discogs_albumid``, ``bandcamp_album_id``,
 ``spotify_album_id``, ``beatport_album_id``, ``deezer_album_id``,
-``tidal_album_id``). On re-imports existing data will be overwritten.
+``tidal_album_id``. For tracks, the fields are ``discogs_trackid``, ``bandcamp_track_id``,
+``spotify_track_id``, ``beatport_track_id``, ``deezer_track_id``,
+``tidal_track_id``. On re-imports existing data will be overwritten.
 
 The default of all options is ``no``.
 

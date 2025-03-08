@@ -213,6 +213,13 @@ class TrackInfo(AttrDict):
         initial_key: str | None = None,
         genre: str | None = None,
         album: str | None = None,
+        discogs_trackid: str | None = None,
+        bandcamp_track_id: str | None = None,
+        spotify_track_id: str | None = None,
+        deezer_track_id: str | None = None,
+        beatport_track_id: str | None = None,
+        youtube_track_id: str | None = None,
+        tidal_track_id: str | None = None,
         **kwargs,
     ):
         self.title = title
@@ -247,6 +254,13 @@ class TrackInfo(AttrDict):
         self.initial_key = initial_key
         self.genre = genre
         self.album = album
+        self.discogs_trackid = discogs_trackid
+        self.bandcamp_track_id = bandcamp_track_id
+        self.spotify_track_id = spotify_track_id
+        self.deezer_track_id = deezer_track_id
+        self.beatport_track_id = beatport_track_id
+        self.youtube_track_id = youtube_track_id
+        self.tidal_track_id = tidal_track_id
         self.update(kwargs)
 
     def copy(self) -> TrackInfo:

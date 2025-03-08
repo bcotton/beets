@@ -34,6 +34,7 @@ from beets.util.id_extractors import (
     beatport_id_regex,
     deezer_id_regex,
     extract_discogs_id_regex,
+    get_youtube_video_id_by_url,
     spotify_id_regex,
 )
 
@@ -100,6 +101,7 @@ TRACK_INCLUDES = list(
         "artists",
         "aliases",
         "isrcs",
+        "url-rels",
         "work-level-rels",
         "artist-rels",
     }
@@ -379,6 +381,41 @@ def track_info(
                 arranger.append(artist_relation["artist"]["name"])
     if arranger:
         info.arranger = ", ".join(arranger)
+
+    # We might find links to external sources (Discogs, Bandcamp, ...)
+    external_ids = config["musicbrainz"]["external_ids"].get()
+    wanted_sources = {site for site, wanted in external_ids.items() if wanted}
+    if wanted_sources and (url_rels := recording.get("url-relation-list")):
+        urls = {}
+
+        for source, url in product(wanted_sources, url_rels):
+            if f"{source}.com" in (target := url["target"]):
+                urls[source] = target
+                log.debug(
+                    "Found link to {} track via MusicBrainz",
+                    source.capitalize(),
+                )
+
+        if "discogs" in urls:
+            info.discogs_trackid = extract_discogs_id_regex(urls["discogs"])
+        if "bandcamp" in urls:
+            info.bandcamp_track_id = urls["bandcamp"]
+        if "spotify" in urls:
+            info.spotify_track_id = MetadataSourcePlugin._get_id(
+                "track", urls["spotify"], spotify_id_regex
+            )
+        if "deezer" in urls:
+            info.deezer_track_id = MetadataSourcePlugin._get_id(
+                "track", urls["deezer"], deezer_id_regex
+            )
+        if "beatport" in urls:
+            info.beatport_track_id = MetadataSourcePlugin._get_id(
+                "track", urls["beatport"], beatport_id_regex
+            )
+        if "youtube" in urls:
+            info.youtube_track_id = get_youtube_video_id_by_url(urls["youtube"])
+        if "tidal" in urls:
+            info.tidal_track_id = urls["tidal"].split("/")[-1]
 
     # Supplementary fields provided by plugins
     extra_trackdatas = plugins.send("mb_track_extract", data=recording)

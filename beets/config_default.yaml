@@ -179,6 +179,7 @@ musicbrainz:
         deezer: no
         beatport: no
         tidal: no
+        youtube: no
 
 match:
     strong_rec_thresh: 0.04

@@ -29,7 +29,7 @@ deezer_id_regex = {
 }
 
 beatport_id_regex = {
-    "pattern": r"(^|beatport\.com/release/.+/)(\d+)$",
+    "pattern": r"(^|beatport\.com/(?:track|release)/.+/)(\d+)(?:$|/)",
     "match_group": 2,
 }
 
@@ -63,3 +63,16 @@ def extract_discogs_id_regex(album_id):
             return int(match.group("id"))
 
     return None
+
+# Lifted from https://gist.github.com/rodrigoborgesdeoliveira/987683cfbfcc8d800192da1e73adc486
+def get_youtube_video_id_by_url(url):
+    regex = r"^((https?://(?:www\.)?(?:m\.)?youtube\.com))/((?:oembed\?url=https?%3A//(?:www\.)youtube.com/watch\?(?:v%3D)(?P<video_id_1>[\w\-]{10,20})&format=json)|(?:attribution_link\?a=.*watch(?:%3Fv%3D|%3Fv%3D)(?P<video_id_2>[\w\-]{10,20}))(?:%26feature.*))|(https?:)?(\/\/)?((www\.|m\.)?youtube(-nocookie)?\.com\/((watch)?\?(app=desktop&)?(feature=\w*&)?v=|embed\/|v\/|e\/)|youtu\.be\/)(?P<video_id_3>[\w\-]{10,20})"
+    match = re.match(regex, url, re.IGNORECASE)
+    if match:
+        return (
+            match.group("video_id_1")
+            or match.group("video_id_2")
+            or match.group("video_id_3")
+        )
+    else:
+        return None
