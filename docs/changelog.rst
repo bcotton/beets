@@ -21,6 +21,9 @@ New features:
   when fetching lyrics.
 * :doc:`plugins/lyrics`: Rewrite lyrics translation functionality to use Azure
   AI Translator API and add relevant instructions to the documentation.
+* Add support to extract external related URLs from MusicBrainz for tracks. 
+  This includes YouTube, Tidal, Deezer, Beatport, Spotify and Bandcamp. IDs
+  are extracted from the URLs and added to the item fields.
 
 Bug fixes:
 

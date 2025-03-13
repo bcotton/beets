@@ -69,8 +69,14 @@ REIMPORT_FRESH_FIELDS_ALBUM = [
     "beatport_album_id",
     "tidal_album_id",
 ]
-REIMPORT_FRESH_FIELDS_ITEM = list(REIMPORT_FRESH_FIELDS_ALBUM)
-
+REIMPORT_FRESH_FIELDS_ITEM = list(REIMPORT_FRESH_FIELDS_ALBUM) + [
+    "discogs_trackid",
+    "bandcamp_track_id",
+    "spotify_track_id",
+    "beatport_track_id",
+    "deezer_track_id",
+    "tidal_track_id",
+]
 # Global logger.
 log = logging.getLogger("beets")
 

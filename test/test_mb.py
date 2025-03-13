@@ -15,6 +15,7 @@
 """Tests for MusicBrainz API wrapper."""
 
 from unittest import mock
+import re
 
 from beets import config
 from beets.autotag import mb
@@ -652,6 +653,89 @@ class MBAlbumInfoTest(BeetsTestCase):
         assert len(t) == 2
         assert t[0].trackdisambig is None
         assert t[1].trackdisambig == "SECOND TRACK"
+
+    def test_track_no_url_relations(self):
+        config["musicbrainz"]["external_ids"] = {
+            "discogs": True,
+            "bandcamp": True,
+            "spotify": True,
+            "deezer": True,
+            "beatport": True,
+            "youtube": True,
+            "tidal": True,
+        }
+        tracks = [self._make_track("TITLE", "ID", 1)]
+        release = self._make_release(None, tracks=tracks)
+        track = mb.album_info(release).tracks[0]
+        assert track.discogs_trackid is None
+        assert track.bandcamp_track_id is None
+        assert track.spotify_track_id is None
+        assert track.deezer_track_id is None
+        assert track.beatport_track_id is None
+        assert track.youtube_track_id is None
+        assert track.tidal_track_id is None
+
+    def _make_track_with_url_relations(self, url_relations):
+        track = self._make_track("TITLE", "ID", 1)
+        track["url-relation-list"] = [{"target": url} for url in url_relations]
+        return track
+
+    def test_track_external_urls(self):
+        config["musicbrainz"]["external_ids"] = {
+            "discogs": True,
+            "bandcamp": True,
+            "spotify": True,
+            "deezer": True,
+            "beatport": True,
+            "youtube": True,
+            "tidal": True,
+        }
+        url_relations = [
+            "https://www.discogs.com/release/12345",
+            "https://bandcamp.com/track/test-track",
+            "https://open.spotify.com/track/5rX6C5QVvvZB7XZQaEkO0O",
+            "https://www.deezer.com/track/987654321",
+            "https://www.beatport.com/track/test/12345",
+            "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "https://tidal.com/track/12345678",
+        ]
+        tracks = [self._make_track_with_url_relations(url_relations)]
+        release = self._make_release(None, tracks=tracks)
+        track = mb.album_info(release).tracks[0]
+
+        assert track.discogs_trackid == 12345
+        assert track.bandcamp_track_id == "https://bandcamp.com/track/test-track"
+        assert track.spotify_track_id == "5rX6C5QVvvZB7XZQaEkO0O"
+        assert track.deezer_track_id == "987654321"
+        assert track.beatport_track_id == "12345"
+        assert track.youtube_track_id == "dQw4w9WgXcQ"
+        assert track.tidal_track_id == "12345678"
+
+    def test_track_partial_external_urls(self):
+        config["musicbrainz"]["external_ids"] = {
+            "discogs": True,
+            "bandcamp": True,
+            "spotify": True,
+            "deezer": True,
+            "beatport": True,
+            "youtube": True,
+            "tidal": True,
+        }
+        url_relations = [
+            "https://open.spotify.com/track/5rX6C5QVvvZB7XZQaEkO0O",
+            "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        ]
+        tracks = [self._make_track_with_url_relations(url_relations)]
+        release = self._make_release(None, tracks=tracks)
+        track = mb.album_info(release).tracks[0]
+
+        assert track.discogs_trackid is None
+        assert track.bandcamp_track_id is None
+        assert track.spotify_track_id == "5rX6C5QVvvZB7XZQaEkO0O"
+        assert track.deezer_track_id is None
+        assert track.beatport_track_id is None
+        assert track.youtube_track_id == "dQw4w9WgXcQ"
+        assert track.tidal_track_id is None
 
 
 class ParseIDTest(BeetsTestCase):
