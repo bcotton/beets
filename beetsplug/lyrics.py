@@ -239,7 +239,7 @@ class RequestHandler:
         except requests.JSONDecodeError:
             self.warn("Could not decode response JSON data")
         except requests.RequestException as exc:
-            self.warn("Request error: {}", exc)
+            self.info("Request error: {}", exc)
 
 
 class BackendClass(type):
